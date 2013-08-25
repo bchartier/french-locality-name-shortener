@@ -1,0 +1,2 @@
+french-locality-name-shortener
+==============================
