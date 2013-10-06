@@ -2,8 +2,9 @@
 # -*- coding: UTF-8 -*-
 
 # ------------------------------------------------------------------------------
-# ShortenFrenchNames.py - Benjamin Chartier - v0.1 - 2013-04-30
-# Programme créant les abréviations de noms de communes françaises
+# shorten_french_names.py - Benjamin Chartier
+# licence MIT (cf. license.txt à la racine du dépôt)
+# Ce programme crée les noms contractés des communes françaises
 # Testé avec Python 3
 
 # Paramètres en entrée du script :
