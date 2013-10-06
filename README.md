@@ -14,19 +14,15 @@ python shorten_french_names.py --input="data/coms_france.csv" --output="data/com
 
 ## Exemples de résultats
 
-| Goudelancourt-lès-Berrieux              | Goudelancourt-lès-B.     | Goudelancourt | 
-| Givonne                                 | Givonne                  | Givonne       | 
-| Saint-Pierre-sur-Vence                  | St-Pierre-sur-V.         | St-Pierre     | 
-| Soligny-les-Étangs                      | Soligny-les-É.           | Soligny       | 
-| Fontiers-Cabardès                       | Fontiers-C.              | Fontiers      | 
-| Mireval-Lauragais                       | Mireval-L.               | Mireval       | 
-| Saint-Martin-de-Mailloc                 | St-Martin-de-M.          | St-Martin     | 
-| Beaumont-sur-Vingeanne                  | Beaumont-sur-V.          | Beaumont      | 
-| Fraignot-et-Vesvrotte                   | Fraignot-et-V.           | Fraignot      | 
-| Saint-Vincent-de-Paul                   | St-Vincent-de-P.         | St-Vincent    | 
-| Saint-Pierre                            | St-Pierre                | St-Pierre     | 
-| Paris 7e Arrondissement                 | Paris 7e arr.            | Paris 7e      | 
-| Druyes-les-Belles-Fontaines             | Druyes-les-B.-F.         | Druyes        | 
+<table>
+  <tr><td>Goudelancourt-lès-Berrieux</td><td>Goudelancourt-lès-B.</td><td>Goudelancourt</td></tr>
+  <tr><td>Givonne</td><td>Givonne</td><td>Givonne</td></tr>
+  <tr><td>Saint-Pierre-sur-Vence</td><td>St-Pierre-sur-V.</td><td>St-Pierre</td></tr>
+  <tr><td>Soligny-les-Étangs</td><td>Soligny-les-É.</td><td>Soligny</td></tr>
+  <tr><td>Fontiers-Cabardès</td><td>Fontiers-C.</td><td>Fontiers</td></tr>
+  <tr><td>Paris 7e Arrondissement</td><td>Paris 7e arr.</td><td>Paris 7e</td></tr>
+  <tr><td>Druyes-les-Belles-Fontaines</td><td>Druyes-les-B.-F.</td><td>Druyes</td></tr>
+</table>
 
 
 ## Source des noms en entrée
