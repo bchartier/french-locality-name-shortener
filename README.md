@@ -34,4 +34,4 @@ Le fichier d'exemple en entrée présent dans le répertoire "data" est basé su
 
 Copyright (c) 2013 Benjamin Chartier
 
-Licence applciable : MIT (cf. license.txt à la racine de ce dépôt)
+Licence applicable : MIT (cf. license.txt à la racine de ce dépôt)
