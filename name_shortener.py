@@ -46,11 +46,13 @@ def divide_string_with_mutiple_seps(s, seps):
     return parts
 
 
-# Traitement d'une ligne : Calcul du nom court et du nom très court à partir du nom complet
-def processLine(self, num_line, original_name):
+# Traitement d'un nom : Calcul du nom court et du nom très court à partir du nom complet
+def processName(original_name):
 
     short_name_parts = []
     very_short_name_parts = []
+    short_name = ""
+    very_short_name = ""
 
     # Suppression des espaces multiples
     complete_name = " ".join(original_name.split())
@@ -228,8 +230,11 @@ def processLine(self, num_line, original_name):
         else:
             last_part_removed = False
 
+    short_name = "".join(short_name_parts)
+    very_short_name = "".join(very_short_name_parts)
+
     return (
         complete_name,
-        "".join(short_name_parts),
-        "".join(very_short_name_parts),
+        short_name,
+        very_short_name,
     )
