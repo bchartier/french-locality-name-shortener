@@ -1,4 +1,4 @@
-import name_shortener
+from name_shortener import *
 
 # Classe gérant le traitement d'un fichier csv
 class NameShortener:
@@ -309,3 +309,53 @@ class NameShortener:
             "".join(short_name_parts),
             "".join(very_short_name_parts),
         )
+
+
+# ------------------------------------------------------------------------------
+# entrées :
+# - le répertoire des fichiers à traiter
+# - le répertoire de destination des nouveaux fichiers
+
+
+def main():
+    """Fonction principale du script"""
+
+    root_dir = os.getcwd()
+    print(root_dir)
+    input_file_path = "input.csv"
+    output_file_path = "output.csv"
+
+    # Récupération des paramètres et des options de la ligne de commande
+    args = None
+    opts = None
+    try:
+        opts, args = getopt.getopt(sys.argv[1:], "", ["input=", "output="])
+        print(opts)
+        print(args)
+    except getopt.GetoptError:
+        print("Pas bon")
+        sys.exit(1)
+
+    # Traitement des options
+    for (o, a) in opts:
+        if o in ("--input"):
+            input_file_path = a
+        elif o in ("--output"):
+            output_file_path = a
+
+    # Calcul des différents répertoires
+    root_dir = os.getcwd()
+    print(input_file_path)
+    print(output_file_path)
+
+    simplifier = NameShortener(input_file_path, output_file_path)
+    simplifier.run()
+
+    print("")
+    print("--------- Script achevé avec succès ---------")
+    print("")
+
+
+# ------------------------------------------------------------------------------
+if __name__ == "__main__":
+    main()
