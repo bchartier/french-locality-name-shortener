@@ -1,10 +1,4 @@
-import sys
-import getopt
-import os
-import string
 import copy
-import random
-import codecs
 
 # Fonction découpant une chaîne en plusieurs parties en utilisant
 # le séparateur fourni en paramètre

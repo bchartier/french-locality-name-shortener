@@ -1,4 +1,9 @@
-from name_shortener import *
+import sys
+import getopt
+import os
+import random
+import codecs
+import name_shortener
 
 # Classe gérant le traitement d'un fichier csv
 class NameShortener:
@@ -72,9 +77,11 @@ class NameShortener:
                         code_insee = code_insee[:3] + code_insee[4:]
 
                     # Calcul du nom court et du nom très court à partir du nom complet
-                    (complete_name, short_name, very_short_name) = processName(
-                        original_name
-                    )
+                    (
+                        complete_name,
+                        short_name,
+                        very_short_name,
+                    ) = name_shortener.processName(original_name)
 
                     # On ajoute un nouvel enregistrement dans le tableau qui servira à écrire le fichier en sortie
                     # Chaque enregistrement comprend le code INSEE, la population, le nom complet,
