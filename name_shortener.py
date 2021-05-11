@@ -1,43 +1,5 @@
 import copy
-
-# Fonction découpant une chaîne en plusieurs parties en utilisant
-# le séparateur fourni en paramètre
-def divide_string_with_one_sep(s, sep):
-    parts = []
-
-    if s == None or sep == "" or sep == None:
-        return parts.append(s)
-
-    before_sep = None
-    after_sep = s
-
-    while len(after_sep) > 0:
-        before_sep, sep, after_sep = after_sep.partition(sep)
-        if len(before_sep) > 0:
-            parts.append(before_sep)
-        if len(sep) > 0:
-            parts.append(sep)
-
-    return parts
-
-
-# Fonction découpant une chaîne en plusieurs parties
-# Les séparateurs à utiliser sont présents dans une liste
-# Grosso modo, cette fonction ne fait qu'appeler la fonction
-# divide_string_with_one_sep de manière itérative avec un séparateur
-# différent
-def divide_string_with_mutiple_seps(s, seps):
-    parts = [s]
-    temp_parts = []
-
-    for sep in seps:
-        for part in parts:
-            temp_parts.extend(divide_string_with_one_sep(part, sep))
-
-        parts = copy.copy(temp_parts)
-        temp_parts = []
-
-    return parts
+import re
 
 
 # Traitement d'un nom : Calcul du nom court et du nom très court à partir du nom complet
@@ -45,8 +7,6 @@ def processName(original_name):
 
     short_name_parts = []
     very_short_name_parts = []
-    short_name = ""
-    very_short_name = ""
 
     # Suppression des espaces multiples
     complete_name = " ".join(original_name.split())
@@ -61,10 +21,10 @@ def processName(original_name):
     # Découpage du nom en mots
     # les séparateurs des mots sont des " " ou des "-"
     name_parts = []
-    name_parts = divide_string_with_mutiple_seps(complete_name, [" ", "-"])
+    name_parts = re.split("( |-)", complete_name)
 
     # Chaines de caractères à conserver dans le nom court
-    parts_to_keep = (
+    linking_words = (
         " ",
         "-",
         "et",
@@ -88,7 +48,7 @@ def processName(original_name):
         "aux",
     )
 
-    parts_to_keep_2 = (
+    adjectives_and_numbers = (
         "Grand",
         "Grande",
         "Grands",
@@ -134,13 +94,24 @@ def processName(original_name):
         "Entre",
     )
 
-    parts_to_keep_3 = "Notre"
+    other_parts_to_keep = ("Notre",)
+
+    parts_to_cut = {
+        "saint": "St",
+        "sainte": "Ste",
+        "saints": "Sts",
+        "saintes": "Stes",
+        "arrondissement": "arr.",
+    }
 
     # Première abréviation
+
+    # Les parties du nom ne comprennent pas '-' ou 'Arrondissement'
     if "-" not in name_parts and "Arrondissement" not in name_parts:
         short_name_parts = copy.copy(name_parts)
-    else:
 
+    # Les parties du nom comprennent '-' ou 'Arrondissement'
+    else:
         # Indicateurs utilisés pour orienter le traitement des mots suivants
         seen_first_dash = False
         seen_second_dash = False
@@ -151,48 +122,44 @@ def processName(original_name):
         for i in range(len(name_parts)):
             part = name_parts[i]
 
-            if part.lower() == "saint":
-                short_name_parts.append("St")
-                if i == 0:
+            if part.lower() in parts_to_cut.keys():
+                # Remplacement de la partie par sa version raccourcie si elle est une des clés du dictionnaire parts_to_cut
+                short_name_parts.append(parts_to_cut[part.lower()])
+                if i == 0 and part.lower() != "arrondissement":
                     begin_with_saint = True
-            elif part.lower() == "sainte":
-                short_name_parts.append("Ste")
-                if i == 0:
-                    begin_with_saint = True
-            elif part.lower() == "saintes":
-                short_name_parts.append("Stes")
-                if i == 0:
-                    begin_with_saint = True
-            elif part.lower() == "saints":
-                short_name_parts.append("Sts")
-                if i == 0:
-                    begin_with_saint = True
-            elif part.lower() == "arrondissement":
-                short_name_parts.append("arr.")
             elif i == 0:
+                # si on traite la première partie du nom et qu'elle ne contient ni saint ni Arrondissement, on ajoute la partie telle quelle
                 short_name_parts.append(part)
-            elif part in parts_to_keep:
+            elif part in linking_words:
+                # si la partie est un des mots de linking_words, on garde cette partie du nom telle quelle
                 short_name_parts.append(part)
             elif part.upper().lower() == part:
+                # si la partie du nom est en minuscules
                 short_name_parts.append(part)
-            elif part in parts_to_keep_3:
+            elif part in other_parts_to_keep:
+                # si la partie est un des mots de other_parts_to_keep (donc juste "Notre"). On garde cette partie du nom telle quelle
                 short_name_parts.append(part)
             elif keep_next_word:
+                # si keep_next_word = True, on ajoute la partie du nom telle quelle (et on passe keep_next_word à False)
                 short_name_parts.append(part)
                 keep_next_word = False
             elif part.upper().lower()[0:2] in ("l'", "d'"):
+                # si les deux premiers caractères de la partie sont "l'"" ou "d'", la partie prend la forme de la première lettre suivie d'un point.
                 short_name_parts.append("{0}.".format(part[0:3]))
             elif seen_first_dash and not begin_with_saint:
+                # La partie ne commence pas par 'saint' et seen_first_dash == True. Elle prend la forme de la première lettre suivie d'un point.
                 short_name_parts.append("{0}.".format(part[0]))
             elif seen_second_dash:
+                # seen_second_dash == True. Elle prend la forme de la première lettre suivie d'un point.
                 short_name_parts.append("{0}.".format(part[0]))
             else:
+                # si aucune modification au-dessus, on ajoute la partie du mot telle quelle
                 short_name_parts.append(part)
 
-            if part in parts_to_keep_2 and not seen_first_dash:
-                keep_next_word = True
-
-            if part in parts_to_keep_3 and not seen_first_dash:
+            if (
+                part in (adjectives_and_numbers or other_parts_to_keep)
+                and not seen_first_dash
+            ):
                 keep_next_word = True
 
             if part == "-":
@@ -209,17 +176,19 @@ def processName(original_name):
     for i in range(len(short_name_parts) - 1, -1, -1):
         part = short_name_parts[i]
 
+        # On supprime la dernière partie si elle contient un '.', si elle fait partie de linking_words,
         if not last_part_removed:
+            # si la dernière partie n'a pas été supprimée, fin du traitement
             pass
         elif "." in part:
             very_short_name_parts.pop()
-        elif part in parts_to_keep:
+        elif part in linking_words:
             very_short_name_parts.pop()
         elif part != " " and part.upper().lower() == part and not part[0].isdigit():
             very_short_name_parts.pop()
-        elif part in ("St", "Sts", "Ste", "Stes"):
+        elif part in parts_to_cut.values():
             very_short_name_parts.pop()
-        elif part == "Notre":
+        elif part in other_parts_to_keep:
             very_short_name_parts.pop()
         else:
             last_part_removed = False
