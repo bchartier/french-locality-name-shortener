@@ -2,11 +2,11 @@ import sys
 import getopt
 import os
 import random
-import codecs
 import name_shortener
+import csv
 
 # Classe gérant le traitement d'un fichier csv
-class NameShortener:
+class NameShortenerCSV:
     # Description
     """Classe gérant le traitement du fichier csv"""
 
@@ -24,9 +24,8 @@ class NameShortener:
     _out_sep = ","
 
     # Numéro d'ordre du champ contenant le nom de la commune
-    _complete_name_field_num = 7
-    _code_insee_field_num = 6
-    _pop_field_num = 10
+    _complete_name_field_num = 3
+    _code_insee_field_num = 0
 
     # Résultat
     _outputLines = []
@@ -42,62 +41,46 @@ class NameShortener:
     # Exécution du processus traitant l'intégralité d'un fichier csv en entrée
     def run(self):
 
-        new_lines = []
+        with open(self._input_file, encoding="utf-8", newline="") as input_csv_file:
+            csv_reader = csv.reader(input_csv_file)
 
-        # Lecture et traitement du fichier en entrée
-        input_file_object = open(self._input_file)
-        try:
             num_line = 0
-            for line in input_file_object:
 
-                # Est-ce que le séparateur ne devrait pas plutôt être un point-virgule ?
-                # On regarde combien de virgules et de points-virgules sont présents dans
-                # la première ligne du fichier en entrée. On utilsie le séparateur présent
-                # le plus grand nombre de fois
+            for row in csv_reader:
+
                 if num_line == 0:
-                    if line.count(",") < line.count(";"):
-                        self._csv_sep = ";"
 
-                    new_lines.append(
-                        self._out_sep.join(
-                            ["code_insee", "pop", "nom", "nom_court", "nom_tres_court"]
+                    with open(
+                        self._output_file, "w", encoding="utf-8", newline=""
+                    ) as output_csv_file:
+                        csv_writer = csv.writer(output_csv_file)
+                        csv_writer.writerow(
+                            ["COM", "NOM_COMPLET", "NOM_COURT", "NOM_TRES_COURT"]
                         )
-                        + "\n"
-                    )
 
-                if num_line > 0:
-                    fields = line.split(self._csv_sep)
-                    original_name = fields[self._complete_name_field_num]
-                    pop = "".join(fields[self._pop_field_num].split())
-                    code_insee = fields[self._code_insee_field_num]
+                    num_line += 1
 
-                    # Cas particulier des communes des DOM pour lesquelles on retire le troisième caractère
-                    # du code INSEE
-                    if len(code_insee) == 6:
-                        code_insee = code_insee[:3] + code_insee[4:]
+                else:
+                    original_name = row[3]
+                    complete_name = name_shortener.NameProcessor(
+                        original_name
+                    ).preprocess_name()
+                    short_name = name_shortener.NameProcessor(
+                        original_name
+                    ).get_short_name()
+                    very_short_name = name_shortener.NameProcessor(
+                        original_name
+                    ).get_very_short_name()
 
-                    # Calcul du nom court et du nom très court à partir du nom complet
-                    (
-                        complete_name,
-                        short_name,
-                        very_short_name,
-                    ) = name_shortener.processName(original_name)
-
-                    # On ajoute un nouvel enregistrement dans le tableau qui servira à écrire le fichier en sortie
-                    # Chaque enregistrement comprend le code INSEE, la population, le nom complet,
-                    # le nom un peu plus court, et le nom très court
-                    new_lines.append(
-                        self._out_sep.join(
-                            [
-                                code_insee.rjust(5, "0"),
-                                pop,
-                                complete_name,
-                                short_name,
-                                very_short_name,
-                            ]
+                    with open(
+                        self._output_file, "a", encoding="utf-8", newline=""
+                    ) as output_csv_file:
+                        csv_writer = csv.writer(output_csv_file)
+                        csv_writer.writerow(
+                            [row[0], complete_name, short_name, very_short_name]
                         )
-                        + "\n"
-                    )
+
+                    num_line += 1
 
                     # Les lignes qui suivent servent juste à afficher quelques enregistrement pour
                     # contrôler visuellement le résultat sur un échantillon
@@ -119,15 +102,6 @@ class NameShortener:
                         very_short_name.ljust(15),
                     )
 
-                num_line += 1
-        finally:
-            input_file_object.close()
-
-        # Ecriture du fichier en sortie
-        output_file_object = codecs.open(self._output_file, "w", "utf-8")
-        output_file_object.writelines(new_lines)
-        output_file_object.close()
-
 
 # ------------------------------------------------------------------------------
 # entrées :
@@ -138,7 +112,7 @@ class NameShortener:
 def main():
     """Fonction principale du script"""
 
-    root_dir = os.getcwd()
+    root_dir = os.getcwd()  # dossier courant
     print(root_dir)
     input_file_path = "input.csv"
     output_file_path = "output.csv"
@@ -147,7 +121,9 @@ def main():
     args = None
     opts = None
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "", ["input=", "output="])
+        opts, args = getopt.getopt(
+            sys.argv[1:], "", ["input=", "output="]
+        )  # récup commande
         print(opts)
         print(args)
     except getopt.GetoptError:
@@ -166,7 +142,7 @@ def main():
     print(input_file_path)
     print(output_file_path)
 
-    simplifier = NameShortener(input_file_path, output_file_path)
+    simplifier = NameShortenerCSV(input_file_path, output_file_path)
     simplifier.run()
 
     print("")

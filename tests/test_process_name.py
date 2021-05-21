@@ -1,13 +1,27 @@
-from name_shortener import processName
+from name_shortener import NameProcessor
 
 # test des noms simples
 def test_process_name_simple():
-    assert processName("Ambronay") == ("Ambronay", "Ambronay", "Ambronay")
+    name = NameProcessor("Ambronay")
+    assert (
+        name.preprocess_name(),
+        name.get_short_name(),
+        name.get_very_short_name(),
+    ) == (
+        "Ambronay",
+        "Ambronay",
+        "Ambronay",
+    )
 
 
 # noms composés
 def test_process_name_compound():
-    assert processName("L' Abergement-Clémenciat") == (
+    name = NameProcessor("L' Abergement-Clémenciat")
+    assert (
+        name.preprocess_name(),
+        name.get_short_name(),
+        name.get_very_short_name(),
+    ) == (
         "L'Abergement-Clémenciat",
         "L'Abergement-C.",
         "L'Abergement",
@@ -16,7 +30,12 @@ def test_process_name_compound():
 
 # noms avec des parenthèses
 def test_process_name_parenthesis():
-    assert processName("Bors (Canton de Baignes-Sainte-Radegonde)") == (
+    name = NameProcessor("Bors (Canton de Baignes-Sainte-Radegonde)")
+    assert (
+        name.preprocess_name(),
+        name.get_short_name(),
+        name.get_very_short_name(),
+    ) == (
         "Bors",
         "Bors",
         "Bors",
@@ -25,7 +44,12 @@ def test_process_name_parenthesis():
 
 # noms avec parts_to_keep_1
 def test_process_name_parts_to_keep_1():
-    assert processName("Margny-lès-Compiègne") == (
+    name = NameProcessor("Margny-lès-Compiègne")
+    assert (
+        name.preprocess_name(),
+        name.get_short_name(),
+        name.get_very_short_name(),
+    ) == (
         "Margny-lès-Compiègne",
         "Margny-lès-C.",
         "Margny",
@@ -34,7 +58,12 @@ def test_process_name_parts_to_keep_1():
 
 # noms avec parts_to_keep_2
 def test_process_name_parts_to_keep_2():
-    assert processName("Saint-Amand-des-Hautes-Terres") == (
+    name = NameProcessor("Saint-Amand-des-Hautes-Terres")
+    assert (
+        name.preprocess_name(),
+        name.get_short_name(),
+        name.get_very_short_name(),
+    ) == (
         "Saint-Amand-des-Hautes-Terres",
         "St-Amand-des-H.-T.",
         "St-Amand",
@@ -43,7 +72,12 @@ def test_process_name_parts_to_keep_2():
 
 # noms avec parts_to_keep_3 == "Notre"
 def test_process_name_parts_to_keep_3():
-    assert processName("Esquay-Notre-Dame") == (
+    name = NameProcessor("Esquay-Notre-Dame")
+    assert (
+        name.preprocess_name(),
+        name.get_short_name(),
+        name.get_very_short_name(),
+    ) == (
         "Esquay-Notre-Dame",
         "Esquay-Notre-D.",
         "Esquay",
@@ -52,7 +86,12 @@ def test_process_name_parts_to_keep_3():
 
 # noms avec "saint"
 def test_process_name_saint():
-    assert processName("Saint-Brice-sous-Forêt") == (
+    name = NameProcessor("Saint-Brice-sous-Forêt")
+    assert (
+        name.preprocess_name(),
+        name.get_short_name(),
+        name.get_very_short_name(),
+    ) == (
         "Saint-Brice-sous-Forêt",
         "St-Brice-sous-F.",
         "St-Brice",
@@ -61,7 +100,12 @@ def test_process_name_saint():
 
 # noms avec "sainte"
 def test_process_name_sainte():
-    assert processName("Sainte-Julie") == (
+    name = NameProcessor("Sainte-Julie")
+    assert (
+        name.preprocess_name(),
+        name.get_short_name(),
+        name.get_very_short_name(),
+    ) == (
         "Sainte-Julie",
         "Ste-Julie",
         "Ste-Julie",
@@ -70,7 +114,12 @@ def test_process_name_sainte():
 
 # noms avec "saintes"
 def test_process_name_saintes():
-    assert processName("Saintes-Maries-de-la-Mer") == (
+    name = NameProcessor("Saintes-Maries-de-la-Mer")
+    assert (
+        name.preprocess_name(),
+        name.get_short_name(),
+        name.get_very_short_name(),
+    ) == (
         "Saintes-Maries-de-la-Mer",
         "Stes-Maries-de-la-M.",
         "Stes-Maries",
@@ -79,7 +128,12 @@ def test_process_name_saintes():
 
 # noms avec "saints"
 def test_process_name_saints():
-    assert processName("La Chapelle-aux-Saints") == (
+    name = NameProcessor("La Chapelle-aux-Saints")
+    assert (
+        name.preprocess_name(),
+        name.get_short_name(),
+        name.get_very_short_name(),
+    ) == (
         "La Chapelle-aux-Saints",
         "La Chapelle-aux-Sts",
         "La Chapelle",
@@ -88,7 +142,12 @@ def test_process_name_saints():
 
 # noms avec "arrondissement":
 def test_process_name_arrondissement():
-    assert processName("Lyon 5e  Arrondissement") == (
+    name = NameProcessor("Lyon 5e  Arrondissement")
+    assert (
+        name.preprocess_name(),
+        name.get_short_name(),
+        name.get_very_short_name(),
+    ) == (
         "Lyon 5e Arrondissement",
         "Lyon 5e arr.",
         "Lyon 5e",
