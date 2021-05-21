@@ -1,2 +1,7 @@
 
 *.cmd
+settings.json
+classe.py
+shorten_french_names_copy.py
+UML.drawio
+*.pyc
