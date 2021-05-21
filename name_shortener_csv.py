@@ -14,21 +14,9 @@ class NameShortenerCSV:
     _input_file = None
     _output_file = None
 
-    # Paramètres de lecture du fichier CSV
-    # Séparateur utilisé pour séparer chaque champ dans le fichier CSV
-    # Par défaut c'est la virgule. Plus bas, le code essaye de détecter si
-    # c'est un ";"
-    _csv_sep = ","
-
-    # Séparateur utilisé pour le fichier en sortie
-    _out_sep = ","
-
-    # Numéro d'ordre du champ contenant le nom de la commune
-    _complete_name_field_num = 3
-    _code_insee_field_num = 0
-
-    # Résultat
-    _outputLines = []
+    # Colonne des numéros INSEE qu'on veut garder dans le fichier de sortie
+    _column_insee = 0
+    _column_original_name = 3
 
     # --------------------------------------------------------------------
     # Constructeur
@@ -61,13 +49,17 @@ class NameShortenerCSV:
                     num_line += 1
 
                 else:
-                    original_name = row[3]
+                    original_name = row[self._column_original_name]
+                    insee_code = row[self._column_insee]
+
                     complete_name = name_shortener.NameProcessor(
                         original_name
                     ).preprocess_name()
+
                     short_name = name_shortener.NameProcessor(
                         original_name
                     ).get_short_name()
+
                     very_short_name = name_shortener.NameProcessor(
                         original_name
                     ).get_very_short_name()
@@ -77,7 +69,12 @@ class NameShortenerCSV:
                     ) as output_csv_file:
                         csv_writer = csv.writer(output_csv_file)
                         csv_writer.writerow(
-                            [row[0], complete_name, short_name, very_short_name]
+                            [
+                                insee_code,
+                                complete_name,
+                                short_name,
+                                very_short_name,
+                            ]
                         )
 
                     num_line += 1
