@@ -9,7 +9,7 @@ Ce programme crée les noms contractés des communes françaises.
 
 Exemple de ligne de commande :
 
-python shorten_french_names.py --input="data/coms_france.csv" --output="data/coms_france_abrev.csv"
+python .\name_shortener_csv.py --input="data/csv_test_input.csv" --output="data/csv_test_output.csv"
 
 
 ## Règles appliquées
