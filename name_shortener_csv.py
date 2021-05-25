@@ -5,31 +5,35 @@ import random
 import name_shortener
 import csv
 
+import click
+
 # Classe gérant le traitement d'un fichier csv
 class NameShortenerCSV:
     # Description
     """Classe gérant le traitement du fichier csv"""
 
     # Fichiers
-    _input_file = None
-    _output_file = None
+    # _input_file = None
+    # _output_file = None
 
     # Colonne des numéros INSEE qu'on veut garder dans le fichier de sortie
-    _column_insee = 0
-    _column_original_name = 3
+    # column_insee = 0
+    # column_original_name = 3
 
     # --------------------------------------------------------------------
     # Constructeur
     def __init__(self, input_file, output_file):
         # Initialisation de la liste des étapes
-        self._input_file = input_file
-        self._output_file = output_file
+        self.input_file = input_file
+        self.output_file = output_file
+        self.column_insee = 0
+        self.column_original_name = 3
 
     # --------------------------------------------------------------------
     # Exécution du processus traitant l'intégralité d'un fichier csv en entrée
     def run(self):
 
-        with open(self._input_file, encoding="utf-8", newline="") as input_csv_file:
+        with open(self.input_file, encoding="utf-8", newline="") as input_csv_file:
             csv_reader = csv.reader(input_csv_file)
 
             num_line = 0
@@ -39,7 +43,7 @@ class NameShortenerCSV:
                 if num_line == 0:
 
                     with open(
-                        self._output_file, "w", encoding="utf-8", newline=""
+                        self.output_file, "w", encoding="utf-8", newline=""
                     ) as output_csv_file:
                         csv_writer = csv.writer(output_csv_file)
                         csv_writer.writerow(
@@ -49,8 +53,8 @@ class NameShortenerCSV:
                     num_line += 1
 
                 else:
-                    original_name = row[self._column_original_name]
-                    insee_code = row[self._column_insee]
+                    original_name = row[self.column_original_name]
+                    insee_code = row[self.column_insee]
 
                     complete_name = name_shortener.NameProcessor(
                         original_name
@@ -65,7 +69,7 @@ class NameShortenerCSV:
                     ).get_very_short_name()
 
                     with open(
-                        self._output_file, "a", encoding="utf-8", newline=""
+                        self.output_file, "a", encoding="utf-8", newline=""
                     ) as output_csv_file:
                         csv_writer = csv.writer(output_csv_file)
                         csv_writer.writerow(
@@ -106,38 +110,20 @@ class NameShortenerCSV:
 # - le répertoire de destination des nouveaux fichiers
 
 
-def main():
+@click.command()
+@click.argument("input", type=click.Path(exists=True))
+@click.argument("output", type=click.Path(exists=False))
+def main(input, output):
     """Fonction principale du script"""
 
-    root_dir = os.getcwd()  # dossier courant
-    print(root_dir)
-    input_file_path = "input.csv"
-    output_file_path = "output.csv"
+    print("")
+    print("--------- Lancement du script ---------")
+    print("")
 
-    # Récupération des paramètres et des options de la ligne de commande
-    args = None
-    opts = None
-    try:
-        opts, args = getopt.getopt(
-            sys.argv[1:], "", ["input=", "output="]
-        )  # récup commande
-        print(opts)
-        print(args)
-    except getopt.GetoptError:
-        print("Pas bon")
-        sys.exit(1)
-
-    # Traitement des options
-    for (o, a) in opts:
-        if o in ("--input"):
-            input_file_path = a
-        elif o in ("--output"):
-            output_file_path = a
-
-    # Calcul des différents répertoires
-    root_dir = os.getcwd()
-    print(input_file_path)
-    print(output_file_path)
+    input_file_path = click.format_filename(input, shorten=False)
+    print("Le fichier csv à traiter est :", input_file_path)
+    output_file_path = click.format_filename(output, shorten=False)
+    print("Le résultat est stocké dans :", output_file_path)
 
     simplifier = NameShortenerCSV(input_file_path, output_file_path)
     simplifier.run()
