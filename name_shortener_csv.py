@@ -116,14 +116,14 @@ class NameShortenerCSV:
 def main(input, output):
     """Fonction principale du script"""
 
-    print("")
-    print("--------- Lancement du script ---------")
-    print("")
-
     input_file_path = click.format_filename(input, shorten=False)
     print("Le fichier csv à traiter est :", input_file_path)
     output_file_path = click.format_filename(output, shorten=False)
     print("Le résultat est stocké dans :", output_file_path)
+
+    print("")
+    print("--------- Lancement du script ---------")
+    print("")
 
     simplifier = NameShortenerCSV(input_file_path, output_file_path)
     simplifier.run()
