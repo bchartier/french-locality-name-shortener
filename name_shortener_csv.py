@@ -1,6 +1,3 @@
-import sys
-import getopt
-import os
 import random
 import name_shortener
 import csv
@@ -33,45 +30,41 @@ class NameShortenerCSV:
     # Exécution du processus traitant l'intégralité d'un fichier csv en entrée
     def run(self):
 
-        with open(self.input_file, encoding="utf-8", newline="") as input_csv_file:
-            csv_reader = csv.reader(input_csv_file)
+        with open(self.input_file, "r", encoding="utf-8", newline="") as input_csv_file:
+            with open(
+                self.output_file, "w", encoding="utf-8", newline=""
+            ) as output_csv_file:
 
-            num_line = 0
+                csv_reader = csv.reader(input_csv_file)
+                csv_writer = csv.writer(output_csv_file)
 
-            for row in csv_reader:
+                num_line = 0
 
-                if num_line == 0:
+                for row in csv_reader:
 
-                    with open(
-                        self.output_file, "w", encoding="utf-8", newline=""
-                    ) as output_csv_file:
-                        csv_writer = csv.writer(output_csv_file)
+                    if num_line == 0:
                         csv_writer.writerow(
                             ["COM", "NOM_COMPLET", "NOM_COURT", "NOM_TRES_COURT"]
                         )
 
-                    num_line += 1
+                        num_line += 1
 
-                else:
-                    original_name = row[self.column_original_name]
-                    insee_code = row[self.column_insee]
+                    else:
+                        original_name = row[self.column_original_name]
+                        insee_code = row[self.column_insee]
 
-                    complete_name = name_shortener.NameProcessor(
-                        original_name
-                    ).preprocess_name()
+                        complete_name = name_shortener.NameProcessor(
+                            original_name
+                        ).preprocess_name()
 
-                    short_name = name_shortener.NameProcessor(
-                        original_name
-                    ).get_short_name()
+                        short_name = name_shortener.NameProcessor(
+                            original_name
+                        ).get_short_name()
 
-                    very_short_name = name_shortener.NameProcessor(
-                        original_name
-                    ).get_very_short_name()
+                        very_short_name = name_shortener.NameProcessor(
+                            original_name
+                        ).get_very_short_name()
 
-                    with open(
-                        self.output_file, "a", encoding="utf-8", newline=""
-                    ) as output_csv_file:
-                        csv_writer = csv.writer(output_csv_file)
                         csv_writer.writerow(
                             [
                                 insee_code,
@@ -81,27 +74,27 @@ class NameShortenerCSV:
                             ]
                         )
 
-                    num_line += 1
+                        num_line += 1
 
-                    # Les lignes qui suivent servent juste à afficher quelques enregistrement pour
-                    # contrôler visuellement le résultat sur un échantillon
-                #    if len(name_parts) > 4 and num_line % 3 == 0:
-                #    if len(name_parts) > 2 and num_line < 50:
-                #    if "Saint" in complete_name:
-                #    if "Arrondissement" in complete_name:
-                #    if "L'" in complete_name:
-                #    if "(" in original_complete_name:
-                #    if "Vieille" in complete_name:
-                #    if "Notre" in original_complete_name:
-                #    if len(name_parts) > 1 and "y" in original_complete_name:
-                if (
-                    random.randint(1, 700) == 1
-                ):  # Affichage d'un enregistrement au hasard sur 700
-                    print(
-                        complete_name.ljust(38),
-                        short_name.ljust(23),
-                        very_short_name.ljust(15),
-                    )
+                        # Les lignes qui suivent servent juste à afficher quelques enregistrement pour
+                        # contrôler visuellement le résultat sur un échantillon
+                    #    if len(name_parts) > 4 and num_line % 3 == 0:
+                    #    if len(name_parts) > 2 and num_line < 50:
+                    #    if "Saint" in complete_name:
+                    #    if "Arrondissement" in complete_name:
+                    #    if "L'" in complete_name:
+                    #    if "(" in original_complete_name:
+                    #    if "Vieille" in complete_name:
+                    #    if "Notre" in original_complete_name:
+                    #    if len(name_parts) > 1 and "y" in original_complete_name:
+                    if (
+                        random.randint(1, 700) == 1
+                    ):  # Affichage d'un enregistrement au hasard sur 700
+                        print(
+                            complete_name.ljust(38),
+                            short_name.ljust(23),
+                            very_short_name.ljust(15),
+                        )
 
 
 # ------------------------------------------------------------------------------
