@@ -5,11 +5,19 @@
 Ce programme crée les noms contractés des communes françaises.
 
 
-## Exemple d'utilisation
+## Comment l'utiliser ?
+
+### Pour traiter un nom de ville
 
 Exemple de ligne de commande :
 
-python .\name_shortener_csv.py data/csv_test_input.csv data/csv_test_output.csv
+python ./name_shortener_csv.py run-one-name "Asnières-sur-Saône"
+
+### Pour traiter un fichier csv
+
+Exemple de ligne de commande :
+
+python ./name_shortener_csv.py run-csv data\csv_test_input.csv data\csv_test_output.csv
 
 
 ## Règles appliquées

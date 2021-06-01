@@ -76,17 +76,6 @@ class NameShortenerCSV:
 
                         num_line += 1
 
-                        # Les lignes qui suivent servent juste à afficher quelques enregistrement pour
-                        # contrôler visuellement le résultat sur un échantillon
-                    #    if len(name_parts) > 4 and num_line % 3 == 0:
-                    #    if len(name_parts) > 2 and num_line < 50:
-                    #    if "Saint" in complete_name:
-                    #    if "Arrondissement" in complete_name:
-                    #    if "L'" in complete_name:
-                    #    if "(" in original_complete_name:
-                    #    if "Vieille" in complete_name:
-                    #    if "Notre" in original_complete_name:
-                    #    if len(name_parts) > 1 and "y" in original_complete_name:
                     if (
                         random.randint(1, 700) == 1
                     ):  # Affichage d'un enregistrement au hasard sur 700
@@ -98,16 +87,18 @@ class NameShortenerCSV:
 
 
 # ------------------------------------------------------------------------------
-# entrées :
-# - le répertoire des fichiers à traiter
-# - le répertoire de destination des nouveaux fichiers
 
 
-@click.command()
+@click.group()
+def csv_file():
+    pass
+
+
+@csv_file.command()
 @click.argument("input", type=click.Path(exists=True))
 @click.argument("output", type=click.Path(exists=False))
-def main(input, output):
-    """Fonction principale du script"""
+def run_csv(input, output):
+    """Command on cli1"""
 
     input_file_path = click.format_filename(input, shorten=False)
     print("Le fichier csv à traiter est :", input_file_path)
@@ -126,6 +117,27 @@ def main(input, output):
     print("")
 
 
+@click.group()
+def one_name():
+    pass
+
+
+@one_name.command()
+@click.argument("originalname")
+def run_one_name(originalname):
+    """Command on cli2"""
+
+    click.echo(f"Nom saisi : {originalname}")
+    complete_name = name_shortener.NameProcessor(originalname).preprocess_name()
+    click.echo(f"Nom complet : {complete_name}")
+    short_name = name_shortener.NameProcessor(originalname).get_short_name()
+    click.echo(f"Nom court : {short_name}")
+    very_short_name = name_shortener.NameProcessor(originalname).get_very_short_name()
+    click.echo(f"Nom très court : {very_short_name}")
+
+
+cli = click.CommandCollection(sources=[csv_file, one_name])
+
 # ------------------------------------------------------------------------------
 if __name__ == "__main__":
-    main()
+    cli()
