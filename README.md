@@ -207,6 +207,6 @@ Le fichier d'exemple en entrée présent dans le répertoire "data" est basé su
 
 ## Copyright - licence
 
-Copyright (c) 2013 Benjamin Chartier
+Auteurs : Benjamin Chartier, Julie Chartier
 
 Licence applicable : MIT (cf. license.txt à la racine de ce dépôt)

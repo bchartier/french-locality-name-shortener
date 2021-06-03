@@ -1,7 +1,7 @@
 import copy
 import re
 
-# Chaines de caractères à conserver dans le nom court
+# Strings to keep in short names
 linking_words = (
     " ",
     "-",
@@ -74,6 +74,7 @@ adjectives_and_numbers = (
 
 other_parts_to_keep = ("Notre",)
 
+# Strings to abbreviate in short names
 parts_to_cut = {
     "saint": "St",
     "sainte": "Ste",
@@ -84,13 +85,26 @@ parts_to_cut = {
 
 
 class NameProcessor:
+    """
+    Class that generates the complete, short and very short name of a locality.
+
+    :param original_name: The original name of the city
+    :type original_name: str
+    """
+
     def __init__(self, original_name):
+        """Constructor method"""
         self.original_name = original_name
 
     def preprocess_name(self):
-        # Suppression des espaces multiples, des espaces après apostrophes et des parenthèses avec leur contenu
-        # print("Nom original : ", self.original_name)
-        # print()
+        """Returns the complete name prepared from the original name.
+
+        This method removes multiple spaces, spaces after apostrophes and parentheses with their content.
+
+        :return: The complete name.
+        :rtype: str
+        """
+
         complete_name = " ".join(self.original_name.split())
         complete_name = complete_name.replace("' ", "'")
         complete_name = complete_name.split("(")[0].strip()
@@ -98,9 +112,19 @@ class NameProcessor:
         return complete_name
 
     def cut_name(self, name_to_cut):
-        # Découpage du nom en mots
-        # les séparateurs des mots sont des " " ou des "-"
+        """Returns the complete name divided into parts.
+
+        This method splits the complete name with these separators : " - ", " -", "- ", " ", "-".
+
+        :param name_to_cut: The name to cut is the complete name genrated by the preprocess_name() method.
+        :type name_to_cut: str
+        :return: A list which contain every single words and spaces in the name
+        :rtype: list
+        """
+
         name_parts = []
+
+        # TODO: enlever les trois premières lignes ?
         if " - " in name_to_cut:
             name_parts = name_to_cut.split(" - ")
         elif " -" in name_to_cut:
@@ -109,64 +133,78 @@ class NameProcessor:
             name_parts = name_to_cut.split("- ")
         else:
             name_parts = re.split("( |-)", name_to_cut)
+
         return name_parts
 
     def get_short_name(self):
+        """Returns the short name of the locality.
+
+        This method uses preprocess_name() and cut_name() methods before shortening the name.
+        Then, if the name do not contain '-' or 'arrondissement', the short name is the same as the original name.
+        Else, the method applies the following rules :
+        - The first word of the name is kept.
+        - keys of parts_to_cut are replaced by their values
+        - If the name begin with 'St' or a similar word, the following word is kept in its
+        entirety.
+        - The words in linking_words, adjectives_and_numbers, other_parts_to_keep are kept in
+        their entirety.
+        - When the word is the first in a sequence of words separated by dashes and this word
+        is part of the parts to keep, the next word is kept.
+        - Words containing "d'" or "l'" are abbreviated : "d'Allier" -> "d'A."
+        - All of the other words are abbreviated with the first letter and a period.
+
+
+        :return: The short name.
+        :rtype: str
+        """
+
         short_name_parts = []
         complete_name = self.preprocess_name()
         complete_name_parts = self.cut_name(complete_name)
 
-        # Les parties du nom ne comprennent pas '-' ou 'Arrondissement'
+        # Parts do not contain '-' ou 'Arrondissement'
         if (
             "-" not in complete_name_parts
             and "Arrondissement" not in complete_name_parts
         ):
             short_name_parts = copy.copy(complete_name_parts)
 
-        # Les parties du nom comprennent '-' ou 'Arrondissement'
+        # Parts contain '-' ou 'Arrondissement'
         else:
-            # Indicateurs utilisés pour orienter le traitement des mots suivants
+            # Indicators used to guide the processing of the following words
             seen_first_dash = False
             seen_second_dash = False
             begin_with_saint = False
             keep_next_word = False
 
-            # Traitement de chaque mot du nom original
+            # Processing of each word
             for i in range(len(complete_name_parts)):
                 part = complete_name_parts[i]
 
                 if part.lower() in parts_to_cut.keys():
-                    # Remplacement de la partie par sa version raccourcie si elle est une des clés du dictionnaire parts_to_cut
+                    # Remplacement of the part, contained in keys of parts_to_cut, with its value
                     short_name_parts.append(parts_to_cut[part.lower()])
                     if i == 0 and part.lower() != "arrondissement":
                         begin_with_saint = True
                 elif i == 0:
-                    # si on traite la première partie du nom et qu'elle ne contient ni saint ni Arrondissement, on ajoute la partie telle quelle
                     short_name_parts.append(part)
                 elif part in linking_words:
-                    # si la partie est un des mots de linking_words, on garde cette partie du nom telle quelle
                     short_name_parts.append(part)
                 elif part.upper().lower() == part:
-                    # si la partie du nom est en minuscules
+                    # Keep the part if it is all lower case
                     short_name_parts.append(part)
                 elif part in other_parts_to_keep:
-                    # si la partie est un des mots de other_parts_to_keep (donc juste "Notre"). On garde cette partie du nom telle quelle
                     short_name_parts.append(part)
                 elif keep_next_word:
-                    # si keep_next_word = True, on ajoute la partie du nom telle quelle (et on passe keep_next_word à False)
                     short_name_parts.append(part)
                     keep_next_word = False
                 elif part.upper().lower()[0:2] in ("l'", "d'"):
-                    # si les deux premiers caractères de la partie sont "l'"" ou "d'", la partie prend la forme de la première lettre suivie d'un point.
                     short_name_parts.append("{0}.".format(part[0:3]))
                 elif seen_first_dash and not begin_with_saint:
-                    # La partie ne commence pas par 'saint' et seen_first_dash == True. Elle prend la forme de la première lettre suivie d'un point.
                     short_name_parts.append("{0}.".format(part[0]))
                 elif seen_second_dash:
-                    # seen_second_dash == True. Elle prend la forme de la première lettre suivie d'un point.
                     short_name_parts.append("{0}.".format(part[0]))
                 else:
-                    # si aucune modification au-dessus, on ajoute la partie du mot telle quelle
                     short_name_parts.append(part)
 
                 if (
@@ -180,10 +218,29 @@ class NameProcessor:
                         seen_second_dash = True
                     else:
                         seen_first_dash = True
+
         short_name = "".join(short_name_parts)
+
         return short_name
 
     def get_very_short_name(self):
+        """Returns the very short name of the locality.
+
+        This method uses get_short_name(), cut_name() methods and it copies the short name
+        before very shortening the name.
+        The short name is scrolled from the right to the left :
+        The word of the name is deleted if :
+        - it is '.'
+        - it is a word in linking_words
+        - it is an abbreviated word
+        The word is kept if :
+        - it is the first word of the name
+        - if the name begin with 'St', it keeps the following word too
+        - the name contain 'arr.' then name of the city and number of district are kept
+
+        :return: The very short name
+        :rtype: str
+        """
         very_short_name_parts = []
 
         short_name = self.get_short_name()
@@ -193,31 +250,31 @@ class NameProcessor:
 
         last_part_removed = True
 
-        # todo: to be removed
-        # print(self.original_name)
-
-        # Traitement de chaque mot du nom court (on ne repart pas du nom complet)
+        # Processing of each word of short_name
         for i in range(len(short_name_parts) - 1, -1, -1):
             part = short_name_parts[i]
 
-            # todo: to be removed
-            # print(f"*{part}*")
-
             # On supprime la dernière partie si elle contient un '.', si elle fait partie de linking_words,
             if not last_part_removed:
-                # si la dernière partie n'a pas été supprimée, fin du traitement
+                # if the last part has not been deleted, end of processing
                 pass
             elif "." in part:
+                # delete the last part if it contains '.'
                 very_short_name_parts.pop()
             elif part in linking_words:
+                # delete the last part if it is contained in linking_words
                 very_short_name_parts.pop()
             elif part != " " and part.upper().lower() == part and not part[0].isdigit():
                 very_short_name_parts.pop()
             elif part in parts_to_cut.values():
+                # delete the last part if it is contained in values of parts_to_cut
                 very_short_name_parts.pop()
             elif part in other_parts_to_keep:
+                # delete the last part if it is contained in other_parts_to_keep
                 very_short_name_parts.pop()
             else:
                 last_part_removed = False
+
         very_short_name = "".join(very_short_name_parts)
+
         return very_short_name
