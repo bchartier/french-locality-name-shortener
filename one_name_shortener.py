@@ -81,6 +81,8 @@ parts_to_cut = {
     "saints": "Sts",
     "saintes": "Stes",
     "arrondissement": "arr.",
+    "sur":"ˢ/",
+    "sous":"ˢ/ₛ"
 }
 
 
